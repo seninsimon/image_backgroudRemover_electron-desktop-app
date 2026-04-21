@@ -3,7 +3,7 @@
 ImgAI is a production-level desktop application specifically designed for the jewelry industry. It provides an automated, AI-driven pipeline to process, organize, and format jewelry product images for diverse print configurations along with relevant metadata capturing. 
 
 ## Features
-- **AI Background Removal**: Automatically extracts the jewel from complex backgrounds using the powerful `rembg` library.
+- **AI Background Removal**: Automatically extracts the jewel from complex backgrounds using **IS-Net** (Dichotomous Image Segmentation) with PyTorch — higher accuracy than rembg for product photography.
 - **Auto Tag Removal**: Uses a YOLOv8 object detection model to locate product tags in the image and cleanly inpaints (removes) them using OpenCV.
 - **Image Enhancement**: Enhances sharpness, brightness, and contrast seamlessly applying PIL adjustments.
 - **Intelligent Organization**: Processed images are automatically cataloged and structured locally (e.g., `outputs/Ring/Gold/...`).
@@ -15,7 +15,7 @@ The project leverages a robust multi-service architecture for rapid background p
 1. **Desktop App (`/app`)**: An **Electron** wrapper holding the frontend client. 
 2. **Frontend (`/client`)**: Built with **React**, **Vite**, and **Tailwind CSS**. Manages state, drag-and-drop processing, and UI representations. 
 3. **Backend API (`/server`)**: A **Node.js** & **Express** application routing image streams, persisting jewelry metadata via **MongoDB** schemas, and orchestrating the local storage paths.
-4. **AI Service (`/ai-service`)**: A **Python & FastAPI** application loaded with **PyTorch**, **OpenCV**, **Ultralytics (YOLOv8)**, and **rembg** handling heavy-lift tensor/image manipulation logic safely away from Node's single thread.
+4. **AI Service (`/ai-service`)**: A **Python & FastAPI** application loaded with **PyTorch**, **OpenCV**, and **IS-Net** handling heavy-lift tensor/image manipulation logic safely away from Node's single thread. Model weights are auto-downloaded from HuggingFace on first run.
 
 ---
 
@@ -36,7 +36,7 @@ Ensure that your MongoDB server is up and running.
 > *The Node backend automatically defaults to `mongodb://127.0.0.1:27017/imgai` but you can edit the `.env` inside the `server/` directory optionally.*
 
 ### 2. Python AI Service
-Boot up the ML pipelines first. Note that on your first run, it will automatically download necessary YOLO weights and model binaries for background removal.
+Boot up the ML pipelines first. On first run, IS-Net weights (~170 MB) will be auto-downloaded from HuggingFace and cached locally in `ai-service/weights/`.
 ```bash
 cd ai-service
 pip install -r requirements.txt
@@ -70,4 +70,4 @@ npm start
 ```
 
 ## Post-Install AI Customization
-Out of the box, ImgAI uses standard weights across rembg and YOLO. For optimal **Tag Removal** detection, you should train a YOLOv8 dataset specifically on "Jewelry Tags" and replace the usage of the auto-downloaded `yolov8n.pt` within the `ai-service/main.py` entry point.
+Out of the box, ImgAI uses IS-Net (`isnet-general-use`) pretrained weights for background removal. For optimal **Tag Removal** detection (currently disabled), you can train a YOLOv8 dataset specifically on "Jewelry Tags" and integrate it into the pipeline within `ai-service/main.py`.

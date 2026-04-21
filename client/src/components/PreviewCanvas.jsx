@@ -69,7 +69,7 @@ export default function PreviewCanvas({ processedImage, apiUrl }) {
             style={{ width: card.width, height: card.height }}
           >
              {/* Left Panel */}
-             <div className="w-1/2 h-full flex items-center justify-center border-r-[1px] border-dashed border-gray-300">
+             <div className="w-1/2 h-full flex items-center justify-center border-r border-dashed border-gray-300">
                <span className="text-gray-400 text-sm transform -rotate-90">Back Text Options</span>
              </div>
              {/* Right Panel */}
